@@ -1,9 +1,9 @@
-import Task from "#components/tasks/tasks-model.js";
+import List from "#components/list/list-model.js";
 import Joi from "joi";
 
 export async function findAll(ctx){
     try{
-        ctx.body = await Task.find({});
+        ctx.body = await List.find({});
     }catch(error){
         ctx.badRequest({message: error.message})
     }
@@ -19,20 +19,9 @@ export async function findById(ctx){
             throw new Error(error)
         }
 
-        ctx.body = await Task.findById(ctx.params.id)
+        ctx.body = await List.findById(ctx.params.id)
     } catch(err){
         ctx.badRequest({message: err.message})
-    }
-}
-
-export async function findByListId(ctx){
-    try{
-        if(!ctx.params.listId) throw new Error("Please give an ID")
-        const tasks = await Task.findByListId(ctx.params.listId)
-        console.log(tasks)
-        ctx.ok(tasks)
-    }catch(err){
-        ctx.badRequest({message:err.message})
     }
 }
 
@@ -43,11 +32,10 @@ export async function create(ctx){
         const taskValidationSchema = Joi.object({
             title:Joi.string().required(),
             description: Joi.string(),
-            list: Joi.string().required()
         })
         const { error } = taskValidationSchema.validate(ctx.request.body)
         if(error) throw new Error(error)
-        await Task.create({title : ctx.request.body.title, description: ctx.request.body.description,list:ctx.request.body.list, created_at, updated_at})
+        await List.create({title : ctx.request.body.title, description: ctx.request.body.description, created_at, updated_at})
         ctx.status = 201
     }catch(err){
         console.log(err)
@@ -60,14 +48,12 @@ export async function update(ctx){
         const idValidationSchema = Joi.object({
             id:Joi.string().required(),
             title:Joi.string(),
-            description:Joi.string(),
-            list: Joi.string()
+            description:Joi.string()
         })
         const { error } = idValidationSchema.validate({
             id:ctx.params.id, 
             title:ctx.request.body.title, 
-            description:ctx.request.body.description,
-            list:ctx.request.body.list})
+            description:ctx.request.body.description})
         if(error){
             throw new Error(error)
         }
@@ -77,7 +63,7 @@ export async function update(ctx){
         if(ctx.request.body.title) updatedTask.title = ctx.request.body.title
         if(ctx.request.body.description) updatedTask.description = ctx.request.body.description
 
-        await Task.findByIdAndUpdate(ctx.params.id, updatedTask)
+        await List.findByIdAndUpdate(ctx.params.id, updatedTask)
         ctx.status = 200
 
     } catch(err){
@@ -96,7 +82,7 @@ export async function deleteById(ctx){
             throw new Error(error)
         }
 
-        ctx.body = await Task.deleteOne({id:ctx.params.id})
+        ctx.body = await List.deleteOne({id:ctx.params.id})
     } catch(err){
         ctx.badRequest({message: err.message})
     }

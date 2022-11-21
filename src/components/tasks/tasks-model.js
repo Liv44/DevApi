@@ -21,8 +21,19 @@ const taskSchema = new Schema({
     isDone : {
         type:Boolean,
         default:false,
+    },
+    list:{
+        type:Schema.Types.ObjectId,
+        required:true,
+        ref:'List'
     }
 
+})
+
+taskSchema.static({
+    findByListId(listId){
+        return this.find({list:listId})
+    }
 })
 
 const Task = mongoose.model('Task', taskSchema)

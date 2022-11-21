@@ -6,6 +6,7 @@ const tasks = new Router()
 tasks.get('/', TaskControllers.findAll)
 
 tasks.get('/:id', TaskControllers.findById)
+tasks.get('/list/:listId', TaskControllers.findByListId)
 
 tasks.post('/', TaskControllers.create)
 
