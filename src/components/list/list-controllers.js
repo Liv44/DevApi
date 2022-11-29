@@ -1,4 +1,6 @@
 import List from "#components/list/list-model.js";
+import Task from "#components/tasks/tasks-model.js";
+
 import Joi from "joi";
 
 export async function findAll(ctx){
@@ -10,19 +12,15 @@ export async function findAll(ctx){
 }
 
 export async function findById(ctx){
-    try{
-        const idValidationSchema = Joi.object({
-            id:Joi.string().required()
-        })
-        const { error } = idValidationSchema.validate({id:ctx.params.id})
-        if(error){
-            throw new Error(error)
-        }
-
-        ctx.body = await List.findById(ctx.params.id)
-    } catch(err){
-        ctx.badRequest({message: err.message})
-    }
+    try {
+        if(!ctx.params.id) throw new Error('No id supplied')
+        const list = await List.findById(ctx.params.id).lean()
+        list.tasks = await Task.findByListId(ctx.params.id)
+        if(!list) { return ctx.notFound() }
+        ctx.ok(list)
+      } catch (e) {
+        ctx.badRequest({ message: e.message })
+      }
 }
 
 export async function create(ctx){

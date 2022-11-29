@@ -10,15 +10,8 @@ const listSchema = new Schema({
     description: {
         type:String,
     },
-    created_at: {
-        type:Date,
-        required:true
-    },
-    updated_at: {
-        type:Date,
-        required:true
-    }
-
+},{
+    timestamps: true
 })
 
 const List = mongoose.model('List', listSchema)
