@@ -21,8 +21,31 @@ const taskSchema = new Schema({
     isDone : {
         type:Boolean,
         default:false,
+    },
+    list:{
+        type:Schema.Types.ObjectId,
+        required:true,
+        ref:'List'
+    },
+    userId:{
+        type:String,
+        required:true
     }
+})
 
+taskSchema.static({
+    findByListId(listId){
+        return this.find({list:listId})
+    },
+    findByListIdAndUserId(listId, userId){
+        return this.find({list:listId, userId:userId})
+    },
+    belongsToUserConnected(task, userId){
+        if(task.userId===userId){
+            return true
+        }
+        return false
+    }
 })
 
 const Task = mongoose.model('Task', taskSchema)
