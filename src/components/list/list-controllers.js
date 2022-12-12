@@ -5,7 +5,9 @@ import Joi from "joi";
 
 export async function findAll(ctx){
     try{
-        ctx.body = await List.find({});
+        const userIdConnected = ctx.state.user.id
+
+        ctx.body = await List.find({ userId:userIdConnected });
     }catch(error){
         ctx.badRequest({message: error.message})
     }
@@ -13,11 +15,22 @@ export async function findAll(ctx){
 
 export async function findById(ctx){
     try {
+        const userIdConnected = ctx.state.user.id
+
         if(!ctx.params.id) throw new Error('No id supplied')
-        const list = await List.findById(ctx.params.id).lean()
-        list.tasks = await Task.findByListId(ctx.params.id)
-        if(!list) { return ctx.notFound() }
-        ctx.ok(list)
+
+        const list = await List.findOne({_id: ctx.params.id}).lean()
+
+        if(!list || list.length=== 0) { return ctx.notFound() }
+        
+        if(!List.belongsToUserConnected(list, userIdConnected)){
+            return ctx.unauthorized({message:"This user cannot access to this list."})
+        }
+
+        const tasks = await Task.findByListId(ctx.params.id)
+
+        ctx.ok({list:list, tasks:tasks})
+
       } catch (e) {
         ctx.badRequest({ message: e.message })
       }
@@ -25,15 +38,13 @@ export async function findById(ctx){
 
 export async function create(ctx){
     try{
-        const created_at = new Date();
-        const updated_at = new Date();
         const taskValidationSchema = Joi.object({
             title:Joi.string().required(),
             description: Joi.string(),
         })
-        const { error } = taskValidationSchema.validate(ctx.request.body)
+        const { error, value } = taskValidationSchema.validate(ctx.request.body)
         if(error) throw new Error(error)
-        await List.create({title : ctx.request.body.title, description: ctx.request.body.description, created_at, updated_at})
+        await List.create({...value, userId:ctx.state.user.id})
         ctx.status = 201
     }catch(err){
         console.log(err)
@@ -61,7 +72,10 @@ export async function update(ctx){
         if(ctx.request.body.title) updatedTask.title = ctx.request.body.title
         if(ctx.request.body.description) updatedTask.description = ctx.request.body.description
 
-        await List.findByIdAndUpdate(ctx.params.id, updatedTask)
+        const listUpdated = await List.updateOne({_id:ctx.params.id, userId : ctx.state.user.id}, updatedTask)
+        if(!listUpdated){
+            ctx.notFound("This list was not found.")
+        }
         ctx.status = 200
 
     } catch(err){
@@ -79,8 +93,11 @@ export async function deleteById(ctx){
         if(error){
             throw new Error(error)
         }
-
-        ctx.body = await List.deleteOne({id:ctx.params.id})
+        
+        ctx.body = {
+            list: await List.deleteOne({_id:ctx.params.id, userId : ctx.state.user.id}),
+            tasks: await Task.find({list: ctx.params.id, userId:ctx.state.user.id}).remove(),
+        }
     } catch(err){
         ctx.badRequest({message: err.message})
     }

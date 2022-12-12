@@ -10,11 +10,24 @@ const listSchema = new Schema({
     description: {
         type:String,
     },
+    userId:{
+        type:String,
+        required:true
+    }
 },{
     timestamps: true
 })
 
-const List = mongoose.model('List', listSchema)
 
+listSchema.static({
+    belongsToUserConnected(list, userId){
+        if(list.userId===userId){
+            return true
+        }
+        return false
+    }
+})
+
+const List = mongoose.model('List', listSchema)
 
 export default List

@@ -1,16 +1,17 @@
 import Router from '@koa/router'
 import * as TaskControllers from '#components/list/list-controllers.js'
+import { isAuthenticatedWithUser } from "#middlewares/jwt-handler.js"
 
 const list = new Router()
 
-list.get('/', TaskControllers.findAll)
+list.get('/', isAuthenticatedWithUser, TaskControllers.findAll)
 
-list.get('/:id', TaskControllers.findById)
+list.get('/:id', isAuthenticatedWithUser, TaskControllers.findById)
 
-list.post('/', TaskControllers.create)
+list.post('/', isAuthenticatedWithUser, TaskControllers.create)
 
-list.put('/:id', TaskControllers.update)
+list.put('/:id', isAuthenticatedWithUser, TaskControllers.update)
 
-list.delete('/:id', TaskControllers.deleteById)
+list.delete('/:id', isAuthenticatedWithUser, TaskControllers.deleteById)
 
 export default list

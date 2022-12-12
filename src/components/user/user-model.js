@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { customAlphabet } from 'nanoid'
+import argon2 from 'argon2'
 import nanoidDictionary from 'nanoid-dictionary'
 import jwt from 'jsonwebtoken'
 const { numbers } = nanoidDictionary
@@ -11,6 +12,12 @@ const userSchema = new Schema({
         lowercase:true,
         required:true,
         unique:true,
+    },
+    firstname:{
+        type:String
+    },
+    lastname:{
+        type:String
     },
     password:{
         type:String,
@@ -45,6 +52,10 @@ userSchema.method({
             expiresIn:process.env.JWT_EXPIRES_IN
         })
         return token
+    },
+    async verifyPassword(passwordNotHashed){
+        console.log(passwordNotHashed, this.password)
+        await argon2.verify(this.password, passwordNotHashed)
     }
 })
 
