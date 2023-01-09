@@ -40,7 +40,6 @@ onMounted(async()=> {
         const res = await getUserInfos()
         fullname.value = res.data.user.firstname + ' ' + res.data.user.lastname
         loading.value = false
-        console.log(res);
     }catch(err){
         loading.value = false
         Notify.create('Error on loading user.')

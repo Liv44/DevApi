@@ -19,9 +19,9 @@
                         <h4>Mes listes</h4>
                         <q-btn label="+" outline @click="toggleAddList(router)"/>
                     </div>
-                    <div v-if="listsFound.length!==0" class="flex column q-gutter-lg">
-                        <div v-for="(list, index) in listsFound" :key="index">
-                            <h5 class="text-weight-normal cursor-pointer" @click="router.push({name:'list', params:{id:list._id}})"> {{list.title}}</h5>
+                    <div v-if="listStore.lists.length!==0" class="flex column q-gutter-lg">
+                        <div v-for="(list, index) in listStore.lists" :key="index">
+                            <h5 class="text-weight-normal cursor-pointer" @click="listStore.setSelectedList(list); router.push({name:'list', params:{id:list._id}, id:list._id})"> {{list.title}}</h5>
                         </div>
                     </div>
                     <div v-else>
@@ -33,7 +33,7 @@
       </q-drawer>
   
       <q-page-container >
-        <router-view class="q-pa-lg" />
+        <router-view class="q-pa-lg" :key="$route.fullPath" />
       </q-page-container>
   
     </q-layout>
@@ -47,21 +47,19 @@ import { toggleAddList } from 'src/services/dialogListService';
 
 const router = useRouter();
 const listStore = useListStore()
-const listsFound = ref([]);
 const loading = ref(true);
 const leftDrawerOpen = ref(true)
+
 
 const logout = () => {
     LocalStorage.clear()
     router.push({name:'homepage'})
 }
 
-
 onMounted(async()=>{
         loading.value = true;
         try{
             await listStore.fillLists()
-            listsFound.value = listStore.lists;
             loading.value = false;
         }catch(err){
             loading.value = false;

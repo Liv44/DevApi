@@ -4,57 +4,56 @@ import argon2 from 'argon2'
 import nanoidDictionary from 'nanoid-dictionary'
 import jwt from 'jsonwebtoken'
 const { numbers } = nanoidDictionary
-const {Schema} = mongoose
+const { Schema } = mongoose
 
 const userSchema = new Schema({
-    email:{
-        type:String,
-        lowercase:true,
-        required:true,
-        unique:true,
+    email: {
+        type: String,
+        lowercase: true,
+        required: true,
+        unique: true,
     },
-    firstname:{
-        type:String
+    firstname: {
+        type: String
     },
-    lastname:{
-        type:String
+    lastname: {
+        type: String
     },
-    password:{
-        type:String,
-        required:true,
-        select:false
+    password: {
+        type: String,
+        required: true,
+        select: false
     },
-    settings:{
-        terms_and_conditions:{
-            type:Boolean,
-            default:false
+    settings: {
+        terms_and_conditions: {
+            type: Boolean,
+            default: false
         },
-        is_email_verified:{
-            type:Boolean,
-            default:false
+        is_email_verified: {
+            type: Boolean,
+            default: false
         },
-        validation_email_token:String,
+        validation_email_token: String,
     }
 }, {
-    timestamp:true
+    timestamp: true
 })
 
 userSchema.method({
-    generateEmailVerificationToken(){
+    generateEmailVerificationToken() {
         const token = customAlphabet(numbers, 5)()
         this.settings.validation_email_token = token
     },
-    generateJWT(){
+    generateJWT() {
         const token = jwt.sign({
             id: this._id
         }, process.env.JWT_SECRET, {
             issuer: process.env.APP_NAME,
-            expiresIn:process.env.JWT_EXPIRES_IN
+            expiresIn: process.env.JWT_EXPIRES_IN
         })
         return token
     },
-    async verifyPassword(passwordNotHashed){
-        console.log(passwordNotHashed, this.password)
+    async verifyPassword(passwordNotHashed) {
         await argon2.verify(this.password, passwordNotHashed)
     }
 })

@@ -1,19 +1,12 @@
 import { LocalStorage, SessionStorage } from 'quasar'
-// import { useListStore } from 'src/stores/lists-store'
 
 const isAuthenticated = async (to, from) => {
 
   const isAuthenticated = LocalStorage.getItem('token') || SessionStorage.getItem('token')
-  console.log(isAuthenticated)
   if (!isAuthenticated && to.name !== 'homepage') {
     return { name: 'homepage' }
   }
 }
-
-// const setList = async (to, from) => {
-//   console.log({ to, from })
-//   const listStore = useListStore();
-// }
 
 const routes = [
   {
@@ -32,8 +25,7 @@ const routes = [
     children: [
       { path: '', name: 'dashboard', component: () => import('components/dashboard/DashboardPage.vue'), },
       {
-        path: 'list/:id', name: 'list', component: () => import('components/dashboard/ListDetail.vue'),
-        // beforeEnter: setList
+        path: 'list/:id', name: 'list', component: () => import('components/dashboard/ListDetail.vue')
       }
 
     ],

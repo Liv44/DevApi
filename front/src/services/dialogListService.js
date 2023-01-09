@@ -1,6 +1,8 @@
 import { Dialog, Notify } from 'quasar'
+import { useListStore } from 'src/stores/lists-store';
 import { createNewList, updateList, deleteList } from './lists';
 
+const listsStore = useListStore();
 
 export const toggleAddList = async (router) => {
     Dialog.create({
@@ -16,8 +18,8 @@ export const toggleAddList = async (router) => {
         noEscDismiss: false
     }).onOk(async data => {
         try {
-            await createNewList({ title: data })
-            router.go(0);
+            await createNewList({ title: data });
+            await listsStore.fillLists();
         } catch (err) {
             Notify.create("Il y a eu une erreur lors de l'ajout de la liste.")
             console.error(err);
@@ -38,7 +40,7 @@ export const toggleUpdateList = async (router, list) => {
     }).onOk(async data => {
         try {
             await updateList({ title: data, id: list._id })
-            router.go(0);
+            await listsStore.fillLists();
         } catch (err) {
             Notify.create("Il y a eu une erreur lors de la modification de la liste.")
             console.error(err);
@@ -63,7 +65,8 @@ export const toggleDeleteList = async (router, list) => {
     }).onOk(async data => {
         try {
             await deleteList(list._id);
-            router.go(0);
+            await listsStore.fillLists();
+            router.push({ name: 'dashboard' })
         } catch (err) {
             Notify.create('Il y a eu une erreur lors de la suppression de la liste.')
             console.error(err)

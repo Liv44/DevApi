@@ -33,9 +33,9 @@
         </div>
         <div v-else>
           <div class="flex column items-start">
-              <q-checkbox class="start" v-model="tasks[0].isDone" :label=tasks[0].title />
+              <q-checkbox class="start" v-model="tasks[0].isDone" :label=tasks[0].title @click="update(tasks[0])"/>
               <div v-if="tasks[1]">
-              <q-checkbox class="start" v-model="tasks[1].isDone" :label=tasks[1].title />
+              <q-checkbox class="start" v-model="tasks[1].isDone" :label=tasks[1].title @click="update(tasks[1])"/>
               </div>
           </div>
           <hr>
@@ -49,7 +49,7 @@
 <script setup>
 import { Notify } from 'quasar';
 import { ref, onMounted } from 'vue';
-import { getTasksByListId } from 'src/services/tasks.js'
+import { getTasksByListId, updateTask } from 'src/services/tasks.js'
 import { useRouter } from 'vue-router';
 import { toggleUpdateList, toggleDeleteList } from 'src/services/dialogListService.js';
 
@@ -59,13 +59,17 @@ const tasks = ref([])
 
 const props = defineProps({list: {type:Object}})
 
-const redirectTo = () => {
-    router.push({name:"list", params:{id:props.list._id}})
+const update = async(task) => {
+    try{
+      await updateTask({taskId: task._id, isDone: task.isDone})
+    } catch(err){
+        Notify.create('Il y a eu une erreur lors de la modification de la tâche.')
+        console.error(err);
+    }
 }
 
 onMounted( async()=>{
     try{
-        console.log(props.list._id)
         const res = await getTasksByListId(props.list._id)
         tasks.value = res.data
     }catch(err){
