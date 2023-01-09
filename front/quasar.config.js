@@ -9,13 +9,14 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 
+const { Notify } = require('quasar');
 const { configure } = require('quasar/wrappers');
 
 
 module.exports = configure(function (/* ctx */) {
   return {
     eslint: {
-      // fix: true,
+      fix: true,
       // include = [],
       // exclude = [],
       // rawOptions = {},
@@ -106,7 +107,9 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        "Notify", "Loading", "Dialog"
+      ]
     },
 
     // animations: 'all', // --- includes all animations

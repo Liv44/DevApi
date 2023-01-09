@@ -1,1 +1,36 @@
 // app global css in SCSS form
+$colours: (
+  "purple": #2F0541,
+  "grey": #F2F2F2
+);
+
+@each $color, $value in $colours {
+  .bg-#{$color} {
+    background-color: $value !important;
+  }
+  .text-#{$color} {
+    color: $value !important;
+  }
+  .icon-#{$color} {
+    // Created for q-chip to set an icon color different from the text-color
+    i {
+      color: $value !important;
+    }
+  }  
+  .border-#{$color}{
+    border-color: $value !important;
+  }
+}
+ 
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
+.card-shadow{
+    box-shadow: #2F0541;
+}
