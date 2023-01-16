@@ -5,6 +5,8 @@
             <h1 class="q-mb-md">Inscrivez vous</h1>
             <q-card>
                 <q-card-section>
+                    <q-input label="Nom" type="text" outlined class="q-mb-md" v-model="form.firstname"></q-input>
+                    <q-input label="Prénom" type="text" outlined class="q-mb-md" v-model="form.lastname"></q-input>
                     <q-input label="Email" type="email" outlined class="q-mb-md" v-model="form.email"></q-input>
                     <q-input label="Mot de passe" type="password" outlined class="q-mb-md" v-model="form.password"></q-input>
                     <q-checkbox label="tems and condictions" v-model="form.terms_and_conditions"></q-checkbox>
@@ -21,7 +23,8 @@ import { ref} from 'vue'
 import { register } from 'src/services/users'
 import { useUserStore } from 'stores/user-store'
 import { Notify } from 'quasar';
-import router from 'src/router';
+import { useRouter } from 'vue-router';
+
 const form = ref({
     email:'',
     password: '',
@@ -31,10 +34,7 @@ const form = ref({
 })
 
 const userStore = useUserStore();
-
-// const handleLogin = async () => {
-//     // await register(form.value)
-// }
+const router = useRouter();
 
 const handleRegister = async () => {
     try{
