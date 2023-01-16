@@ -8,7 +8,9 @@ users.get('/me', isAuthenticatedWithUser, (ctx)=>{
     ctx.body= {
         user:{
             email:ctx.state.user.email,
-            id:ctx.state.user.id
+            id:ctx.state.user.id,
+            firstname:ctx.state.user.firstname,
+            lastname:ctx.state.user.lastname,
         }
     } 
 })
